@@ -110,10 +110,28 @@ INSERT INTO Cards (Amount, ClientID, BankID) VALUES
 GO
 
 -------Task 1-------
+DECLARE @CityX nvarchar(20) = 'Vitebsk'
+
+SELECT b.Name, c.Name FROM BranchOffices as bo
+JOIN Banks b on b.Id = bo.BankId
+JOIN Cities c on c.Id = bo.CityId
+WHERE c.Name = @CityX
+
 -------Task 2-------
+
+
 -------Task 3-------
+
+
 -------Task 4-------
+
+
 -------Task 5-------
+
+
 -------Task 6-------
+
 -------Task 7-------
+
+
 -------Task 8-------
