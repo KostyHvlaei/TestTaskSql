@@ -116,12 +116,14 @@ SELECT b.Name, c.Name FROM BranchOffices as bo
 JOIN Banks b on b.Id = bo.BankId
 JOIN Cities c on c.Id = bo.CityId
 WHERE c.Name = @CityX
+GO
 
 -------Task 2-------
 SELECT c.FirstName AS HolderName, card.Amount as Amount, b.Name as BankName
 FROM Cards card
 JOIN Banks b ON card.BankID = b.Id
 JOIN Clients c ON card.ClientID = c.Id
+GO
 
 -------Task 3-------
 SELECT acc.BankId, acc.ClientId, acc.Amount, SUM(card.Amount) AS SumCardsAmount
@@ -129,6 +131,7 @@ FROM Accounts acc
 JOIN Cards card ON acc.ClientId = card.ClientID AND acc.BankId = card.BankID
 GROUP BY acc.BankId, acc.ClientId, acc.Amount
 HAVING acc.Amount <> SUM(card.Amount)
+GO
 
 -------Task 4-------
 SELECT sc.Name AS SoicailState, COUNT(card.ClientID) AS CountOfCards
@@ -136,7 +139,7 @@ FROM SocialGroups AS sc
 JOIN Clients c ON c.SocialGroupId = sc.Id
 JOIN Cards card ON card.ClientID = c.Id
 GROUP BY sc.Name
-
+GO
 
 --TODO: Избавится от костыля
 SELECT DISTINCT sc.Name AS SocialState,
@@ -144,10 +147,44 @@ SELECT DISTINCT sc.Name AS SocialState,
 FROM SocialGroups AS sc
 JOIN Clients c ON c.SocialGroupId = sc.Id
 JOIN Cards card ON card.ClientID = c.Id
-
+GO
 
 -------Task 5-------
+CREATE PROCEDURE AddTenDollarsToSocStatus @soc_state_id INT AS
+BEGIN
+    --Main proc
+    IF (SELECT COUNT(*) FROM SocialGroups WHERE Id = @soc_state_id) = 0
+    BEGIN
+        PRINT 'There is no social status with this id'
+        RETURN
+    END;
 
+    IF (SELECT COUNT(*) FROM Accounts
+        JOIN Clients c on c.Id = Accounts.ClientId
+        WHERE c.SocialGroupId = @soc_state_id) = 0
+    BEGIN
+        PRINT 'There is no account with holder with this social status'
+        RETURN
+    END;
+
+    UPDATE Accounts SET Amount = Amount + 10
+    WHERE (SELECT SocialGroupId FROM Clients c WHERE c.Id = ClientId) = @soc_state_id
+END;
+GO
+
+--Test:
+DECLARE @soc_state_id INT = 2
+
+SELECT Amount, c.FirstName, c.SocialGroupId FROM Accounts
+JOIN Clients c on c.Id = Accounts.ClientId
+WHERE c.SocialGroupId = @soc_state_id
+
+EXEC AddTenDollarsToSocStatus @soc_state_id
+
+SELECT Amount, c.FirstName, c.SocialGroupId FROM Accounts
+JOIN Clients c on c.Id = Accounts.ClientId
+WHERE c.SocialGroupId = @soc_state_id
+GO
 
 -------Task 6-------
 
