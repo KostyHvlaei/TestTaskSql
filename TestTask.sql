@@ -118,7 +118,10 @@ JOIN Cities c on c.Id = bo.CityId
 WHERE c.Name = @CityX
 
 -------Task 2-------
-
+SELECT c.FirstName AS HolderName, card.Amount as Amount, b.Name as BankName
+FROM Cards card
+JOIN Banks b ON card.BankID = b.Id
+JOIN Clients c ON card.ClientID = c.Id
 
 -------Task 3-------
 
@@ -130,6 +133,7 @@ WHERE c.Name = @CityX
 
 
 -------Task 6-------
+
 
 -------Task 7-------
 
