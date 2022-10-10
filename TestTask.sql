@@ -187,7 +187,13 @@ WHERE c.SocialGroupId = @soc_state_id
 GO
 
 -------Task 6-------
-
+SELECT client.Id , bank.Name, acc.Amount as AccountAmount, acc.Amount - SUM(card.Amount) AS AccountCardsDiff
+FROM Accounts acc
+JOIN Banks bank on acc.BankId = bank.Id
+JOIN Clients client on acc.ClientId = client.Id
+JOIN Cards card ON card.ClientID = acc.ClientId AND card.BankID = acc.BankId
+GROUP BY client.Id, bank.Name, acc.Amount
+GO
 
 -------Task 7-------
 
