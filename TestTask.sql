@@ -124,7 +124,11 @@ JOIN Banks b ON card.BankID = b.Id
 JOIN Clients c ON card.ClientID = c.Id
 
 -------Task 3-------
-
+SELECT acc.BankId, acc.ClientId, acc.Amount, SUM(card.Amount) AS SumCardsAmount
+FROM Accounts acc
+JOIN Cards card ON acc.ClientId = card.ClientID AND acc.BankId = card.BankID
+GROUP BY acc.BankId, acc.ClientId, acc.Amount
+HAVING acc.Amount <> SUM(card.Amount)
 
 -------Task 4-------
 
