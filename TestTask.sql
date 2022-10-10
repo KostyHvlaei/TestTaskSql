@@ -131,6 +131,19 @@ GROUP BY acc.BankId, acc.ClientId, acc.Amount
 HAVING acc.Amount <> SUM(card.Amount)
 
 -------Task 4-------
+SELECT sc.Name AS SoicailState, COUNT(card.ClientID) AS CountOfCards
+FROM SocialGroups AS sc
+JOIN Clients c ON c.SocialGroupId = sc.Id
+JOIN Cards card ON card.ClientID = c.Id
+GROUP BY sc.Name
+
+
+--TODO: Избавится от костыля
+SELECT DISTINCT sc.Name AS SocialState,
+       (SELECT COUNT(*) FROM Cards crd WHERE crd.ClientID = c.Id AND c.Id = sc.Id) AS CountOfCards
+FROM SocialGroups AS sc
+JOIN Clients c ON c.SocialGroupId = sc.Id
+JOIN Cards card ON card.ClientID = c.Id
 
 
 -------Task 5-------
