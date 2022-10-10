@@ -233,3 +233,51 @@ SELECT * FROM Cards WHERE Id = @card_to_transfer
 GO
 
 -------Task 8-------
+CREATE TRIGGER Accounts_UPDATE
+ON Accounts AFTER UPDATE, INSERT AS
+BEGIN
+    DECLARE @cards_amount MONEY, @client_id INT, @bank_id INT
+    SET @client_id = (SELECT ClientID FROm deleted)
+    SET @bank_id = (SELECT BankId FROm deleted)
+    SET @cards_amount =
+        (SELECT SUM(Amount) FROM Cards c WHERE c.ClientID = @client_id AND c.BankID = @bank_id)
+
+    IF (SELECT Amount FROM Accounts WHERE ClientId = @client_id AND BankId = @bank_id) < @cards_amount
+    BEGIN
+        PRINT 'Error: The new value is less the cards amount of this account'
+        ROLLBACK TRANSACTION
+    END;
+END;
+GO
+
+CREATE TRIGGER Cards_UPDATE
+ON Cards AFTER UPDATE, INSERT AS
+BEGIN
+    DECLARE @acc_amount MONEY, @cards_amount MONEY, @client_id INT, @bank_id INT
+    SET @client_id = (SELECT ClientID FROm deleted)
+    SET @bank_id = (SELECT BankId FROm deleted)
+
+    SET @acc_amount =
+        (SELECT Amount FROM Accounts acc WHERE acc.BankId = @bank_id AND acc.ClientId = @client_id)
+    SET @cards_amount =
+        (SELECT SUM(Amount) FROM Cards card WHERE card.ClientID = @client_id AND card.BankID = @bank_id)
+
+    IF @cards_amount > @acc_amount
+    BEGIN
+        PRINT 'Error: There are not enough money to set this value'
+        ROLLBACK TRANSACTION
+    END;
+END
+GO
+
+--Test
+SELECT client.Id AS ClientId, bank.Id AS BankId, acc.Amount as AccAmount,
+       card.Id AS CardId, card.Amount AS CardAmount
+FROM Cards card
+JOIN Accounts acc ON card.ClientID = acc.ClientId AND card.BankID = acc.BankId
+JOIN Banks bank on acc.BankId = bank.Id
+JOIN Clients client on acc.ClientId = client.Id
+WHERE client.Id = 0 and bank.Id = 0
+
+UPDATE Cards SET Amount = 1000 WHERE Id = 1
+UPDATE Accounts SET Amount = 100 WHERE ClientId = 0 AND BankId = 0
