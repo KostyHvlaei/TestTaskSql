@@ -1,6 +1,6 @@
-﻿CREATE DATABASE TestTask
+﻿CREATE DATABASE TestTaskTmp
 GO
-USE TestTask
+USE TestTaskTmp
 
 -------DDL Part-------
 CREATE TABLE dbo.Banks(
@@ -55,7 +55,59 @@ CREATE TABLE dbo.Cards(
 )
 GO
 -------Inserting values-------
+INSERT INTO Banks (Name) VALUES
+('BelarusBank'),
+('BelinvestBank'),
+('SberBank'),
+('Priorbank'),
+('GazpromBank')
 
+INSERT INTO SocialGroups (Name) VALUES
+('Child'),
+('Employer'),
+('Unemployed'),
+('Retiree'),
+('VIP')
+
+INSERT INTO Cities (Name) VALUES
+('Minsk'),
+('Brest'),
+('Vitebsk'),
+('Grodno'),
+('Gomel')
+GO
+
+INSERT INTO Clients (FirstName, LastName, SocialGroupId) VALUES
+('Ivan', 'Petrov', 0),
+('Vitaly', 'Vasiliev', 1),
+('Vladislav', 'Zaicev', 1),
+('Maxim', 'Petrov', 3),
+('Nikita', 'Buyanov', 2)
+
+GO
+
+INSERT INTO BranchOffices (CityId, BankId) VALUES
+(0, 0),
+(1, 0),
+(2, 3),
+(2, 4),
+(3, 2)
+
+INSERT INTO Accounts (ClientId, BankId, Amount) VALUES
+(0, 0, 1000),
+(0, 1, 1200),
+(1, 1, 4000),
+(2, 1, 900),
+(3, 0, 1100)
+GO
+
+INSERT INTO Cards (Amount, ClientID, BankID) VALUES
+(200, 0 , 0),
+(300, 0 , 0),
+(700, 0 , 1),
+(3500, 1 , 1),
+(150, 3 , 0)
+GO
 
 -------Task 1-------
 -------Task 2-------
