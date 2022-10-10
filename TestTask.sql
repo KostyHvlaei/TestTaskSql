@@ -196,6 +196,40 @@ GROUP BY client.Id, bank.Name, acc.Amount
 GO
 
 -------Task 7-------
+CREATE PROCEDURE TransferMoneyToCardFromAccount @sum_to_transfer MONEY, @card_id INT AS
+BEGIN
+    BEGIN TRANSACTION
 
+    IF (SELECT COUNT(*) FROM Cards WHERE Id = @card_id) = 0
+        BEGIN
+            ROLLBACK TRANSACTION
+            PRINT 'There in no account with this id'
+            RETURN
+        END;
+
+    DECLARE @available_sum MONEY;
+    DECLARE @bank_id INT = (SELECT BankID FROM Cards WHERE Id = @card_id);
+    DECLARE @client_id INT = (SELECT ClientId FROM Cards WHERE Id = @card_id);
+    DECLARE @all_cards_amount MONEY = (SELECT SUM(Amount) FROM Cards WHERE BankID = @bank_id AND ClientID = @client_id);
+    SET @available_sum =
+        (SELECT Amount FROM Accounts WHERE ClientId = @client_id AND BankId = @bank_id) - @all_cards_amount;
+
+    IF @available_sum < @sum_to_transfer
+        BEGIN
+            ROLLBACK TRANSACTION
+            PRINT 'Insufficient funds'
+            RETURN
+        END;
+
+    UPDATE Cards SET Amount = Amount + @sum_to_transfer WHERE Id = @card_id
+    COMMIT TRANSACTION
+END;
+GO
+
+DECLARE @card_to_transfer INT = 0, @sum INT = 400
+SELECT * FROM Cards WHERE Id = @card_to_transfer
+EXEC TransferMoneyToCardFromAccount @sum, @card_to_transfer
+SELECT * FROM Cards WHERE Id = @card_to_transfer
+GO
 
 -------Task 8-------
